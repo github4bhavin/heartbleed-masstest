@@ -116,13 +116,13 @@ def hit_hb(s):
             return False
 
 
-def is_vulnerable(domain):
+def is_vulnerable(domain,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
     #print 'Connecting...'
     #sys.stdout.flush()
     try:
-        s.connect((domain, 443))
+        s.connect((domain, port))
     except Exception, e:
         return None
     #print 'Sending Client Hello...'
@@ -158,10 +158,20 @@ def main():
     f = open(args[0], 'r')
     for line in f:
         rank, domain = line.split(',')
-        domain = domain.strip()
-        print "Testing " + domain + "... ",
+        domain       = domain.strip()
+		tmpArray     = domain.split(":")
+		defaultPort  = 443
+		
+		if tmpArray[0] is not None:
+			domain = tmpArray[0]
+			
+		if len( tmpArray ) > 1 :
+			port = array[1]
+			
+        print "Testing " + domain +  ':' + str(port) + "... ",
+		
         sys.stdout.flush()
-        result = is_vulnerable(domain)
+        result = is_vulnerable(domain, port)
         if result is None:
             print "no SSL."
             counter_nossl += 1
